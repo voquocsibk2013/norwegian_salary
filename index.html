@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lønnsfordeling i Norge 2024</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #fff; color: #1a1a1a; margin: 0; padding: 2rem; max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+  .metrics { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .metric { background: #f5f5f3; border-radius: 8px; padding: 0.75rem 1rem; min-width: 130px; }
+  .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .metric-value { font-size: 20px; font-weight: 500; }
+  .legend { display: flex; gap: 16px; margin-bottom: 10px; font-size: 12px; color: #666; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend-box { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 340px; }
+  .source { font-size: 11px; color: #aaa; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<h1>Lønnsfordeling i Norge – 2024</h1>
+<p class="subtitle">Antall jobber per månedslønnsintervall. Heltidsekvivalenter, alle sektorer, før skatt.</p>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">Median lønn</div>
+    <div class="metric-value">53 490 kr</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Gjennomsnitt</div>
+    <div class="metric-value">59 370 kr</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Vanligste intervall</div>
+    <div class="metric-value">40 000–45 000 kr</div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="legend-box" style="background:#85B7EB;"></span>Antall jobber</span>
+  <span><span class="legend-box" style="background:#185FA5;"></span>Vanligste intervall</span>
+  <span><span class="legend-box" style="background:#D85A30;"></span>Median (53 490 kr)</span>
+  <span><span class="legend-box" style="background:#1D9E75;"></span>Gjennomsnitt (59 370 kr)</span>
+</div>
+
+<div class="chart-wrap">
+  <canvas id="salaryChart" role="img" aria-label="Søylediagram over lønnsfordeling i Norge 2024. Mest vanlige intervall er 40 000–45 000 kr/mnd. Median 53 490 kr, gjennomsnitt 59 370 kr.">
+    Lønnsfordeling Norge 2024: flest jobber i 40 000–45 000 kr/mnd, median 53 490 kr, gjennomsnitt 59 370 kr.
+  </canvas>
+</div>
+<p class="source">Kilde: SSB lønnsstatistikk 2024 (tabell 11418), via FriFagbevegelse.</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const labels = [
+  '5–10k','10–15k','15–20k','20–25k','25–30k','30–35k','35–40k',
+  '40–45k','45–50k','50–55k','55–60k','60–65k','65–70k','70–75k',
+  '75–80k','80–85k','85–90k','90–100k','100–120k','120k+'
+];
+const data = [18,26,38,55,80,115,190,430,350,270,210,165,128,95,70,52,40,52,60,45];
+const medianIdx = 7.6;
+const avgIdx   = 11.85;
+
+new Chart(document.getElementById('salaryChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      label: 'Antall jobber (tusen)',
+      data,
+      backgroundColor: data.map((_, i) => i === 7 ? '#185FA5' : '#85B7EB'),
+      borderWidth: 0,
+      barPercentage: 0.95,
+      categoryPercentage: 1.0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ' ~' + ctx.parsed.y.toLocaleString('nb-NO') + ' 000 jobber'
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 10 }, color: '#888', autoSkip: false, maxRotation: 45 }
+      },
+      y: {
+        grid: { color: 'rgba(136,135,128,0.15)' },
+        ticks: { font: { size: 11 }, color: '#888', callback: v => v + 'k' },
+        title: { display: true, text: 'Antall jobber (tusen)', font: { size: 11 }, color: '#888' }
+      }
+    }
+  },
+  plugins: [{
+    id: 'verticalLines',
+    afterDraw(chart) {
+      const { ctx, scales: { x, y } } = chart;
+      const drawLine = (idx, color) => {
+        const xPos = x.getPixelForValue(idx);
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.moveTo(xPos, y.top);
+        ctx.lineTo(xPos, y.bottom);
+        ctx.stroke();
+        ctx.restore();
+      };
+      drawLine(medianIdx, '#D85A30');
+      drawLine(avgIdx,    '#1D9E75');
+    }
+  }]
+});
+</script>
+</body>
+</html>
