@@ -3,124 +3,422 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lønnsfordeling i Norge 2024</title>
+<title>Norsk lønnsstatistikk – SSB</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  body { font-family: system-ui, sans-serif; background: #fff; color: #1a1a1a; margin: 0; padding: 2rem; max-width: 860px; margin: 0 auto; }
-  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; }
-  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
-  .metrics { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-  .metric { background: #f5f5f3; border-radius: 8px; padding: 0.75rem 1rem; min-width: 130px; }
-  .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
-  .metric-value { font-size: 20px; font-weight: 500; }
-  .legend { display: flex; gap: 16px; margin-bottom: 10px; font-size: 12px; color: #666; flex-wrap: wrap; }
-  .legend span { display: flex; align-items: center; gap: 5px; }
-  .legend-box { width: 10px; height: 10px; border-radius: 2px; }
-  .chart-wrap { position: relative; width: 100%; height: 340px; }
-  .source { font-size: 11px; color: #aaa; margin-top: 6px; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f1eb;--surface:#faf8f4;--surface2:#edeae2;--border:#d6d1c4;
+  --text:#1a1714;--muted:#7a7568;--accent:#c94f2c;--accent2:#2c6e5e;--accent3:#2a4a8c;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--text);color:var(--bg);padding:2.5rem 3rem 2rem;border-bottom:3px solid var(--accent)}
+header .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9a9182;margin-bottom:.5rem}
+header h1{font-size:clamp(1.6rem,4vw,2.6rem);font-weight:300;letter-spacing:-.02em;line-height:1.15}
+header h1 span{color:var(--accent);font-weight:500}
+header .sub{margin-top:.5rem;font-size:14px;color:#9a9182}
+.main{max-width:1100px;margin:0 auto;padding:2.5rem 2rem 4rem}
+.controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:2rem}
+.ctrl-group{display:flex;flex-direction:column;gap:6px}
+.ctrl-group label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+select{
+  font-family:var(--sans);font-size:14px;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:6px;padding:8px 32px 8px 12px;color:var(--text);appearance:none;cursor:pointer;min-width:110px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7568' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+}
+select:focus{outline:none;border-color:var(--accent)}
+.mode-toggle{display:flex;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface)}
+.mode-toggle button{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;padding:8px 16px;cursor:pointer;color:var(--muted);transition:all .15s}
+.mode-toggle button.active{background:var(--text);color:var(--bg)}
+#loading{text-align:center;padding:4rem;font-family:var(--mono);font-size:13px;color:var(--muted);letter-spacing:.05em}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:2rem}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:1rem 1.25rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.c1::before{background:var(--accent)}.stat-card.c2::before{background:var(--accent2)}
+.stat-card.c3::before{background:var(--accent3)}.stat-card.c4::before{background:#c49a22}
+.s-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.s-val{font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1.1}
+.s-year{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.s-compare{font-family:var(--mono);font-size:11px;margin-top:4px}
+.s-compare.up{color:var(--accent2)}.s-compare.dn{color:var(--accent)}
+.panel{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem}
+.panel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px}
+.panel-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-band{width:20px;height:10px;border-radius:2px;flex-shrink:0;opacity:.4}
+.chart-wrap{position:relative;width:100%;height:300px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:680px){.two-col{grid-template-columns:1fr}}
+.bar-group{margin-bottom:1.25rem}
+.bar-label{font-size:13px;margin-bottom:5px}
+.bar-track{background:var(--surface2);border-radius:4px;height:28px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-family:var(--mono);font-size:12px;color:#fff;transition:width .6s cubic-bezier(.16,1,.3,1);min-width:80px;white-space:nowrap}
+.error-box{background:#fff3f0;border:1.5px solid #f5b8ae;border-radius:8px;padding:1.5rem;color:#9b2d1a;font-size:14px;text-align:center}
+footer{text-align:center;padding:2rem;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.05em;border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
-
-<h1>Lønnsfordeling i Norge – 2024</h1>
-<p class="subtitle">Antall jobber per månedslønnsintervall. Heltidsekvivalenter, alle sektorer, før skatt.</p>
-
-<div class="metrics">
-  <div class="metric">
-    <div class="metric-label">Median lønn</div>
-    <div class="metric-value">53 490 kr</div>
-  </div>
-  <div class="metric">
-    <div class="metric-label">Gjennomsnitt</div>
-    <div class="metric-value">59 370 kr</div>
-  </div>
-  <div class="metric">
-    <div class="metric-label">Vanligste intervall</div>
-    <div class="metric-value">40 000–45 000 kr</div>
+<header>
+  <div class="eyebrow">Statistisk sentralbyrå · Live data · Tabell 11418 + 12521</div>
+  <h1>Norsk <span>lønnsstatistikk</span></h1>
+  <div class="sub">Månedslønn for heltidsansatte · 2015–2025 · Alle yrker, alle sektorer</div>
+</header>
+<div class="main">
+  <div id="loading"><div class="spinner"></div>Henter data fra SSB…</div>
+  <div id="error-area" style="display:none"></div>
+  <div id="app" style="display:none">
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Modus</label>
+        <div class="mode-toggle">
+          <button class="active" id="btn-single" onclick="setMode('single')">Enkeltår</button>
+          <button id="btn-compare" onclick="setMode('compare')">Sammenlign</button>
+        </div>
+      </div>
+      <div class="ctrl-group">
+        <label id="lbl-y1">År</label>
+        <select id="sel-y1" onchange="render()"></select>
+      </div>
+      <div class="ctrl-group" id="ctrl-y2" style="display:none">
+        <label>Sammenlign med</label>
+        <select id="sel-y2" onchange="render()"></select>
+      </div>
+      <div class="ctrl-group">
+        <label>Sektor</label>
+        <select id="sel-sector" onchange="refetch()">
+          <option value="ALLE">Alle sektorer</option>
+          <option value="A+B+D+E">Privat sektor</option>
+          <option value="6500">Kommunal sektor</option>
+          <option value="6100">Statsforvaltningen</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Kjønn</label>
+        <select id="sel-gender" onchange="refetch()">
+          <option value="0">Begge kjønn</option>
+          <option value="1">Menn</option>
+          <option value="2">Kvinner</option>
+        </select>
+      </div>
+    </div>
+    <div class="stat-row" id="stat-row"></div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Lønnsutvikling 2015–2025</div>
+        <div class="legend">
+          <span><span class="legend-dot" style="background:var(--accent)"></span>Median</span>
+          <span><span class="legend-dot" style="background:var(--accent2)"></span>Gjennomsnitt</span>
+          <span><span class="legend-band" style="background:#c49a22"></span>Q1–Q3 (25–75%)</span>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="trendChart" role="img" aria-label="Lønnsutvikling Norge 2015-2025"></canvas></div>
+    </div>
+    <div id="single-section" class="two-col">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title" id="dist-title">Lønnsnivåer</div></div>
+        <div class="chart-wrap" style="height:240px"><canvas id="distChart" role="img" aria-label="Lønnsnivåer valgt år"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Medienvekst år for år</div></div>
+        <div class="chart-wrap" style="height:240px"><canvas id="growthChart" role="img" aria-label="Lønnsvekst år for år"></canvas></div>
+      </div>
+    </div>
+    <div id="compare-section" class="panel" style="display:none">
+      <div class="panel-header"><div class="panel-title" id="cmp-title">Sammenligning</div></div>
+      <div id="cmp-bars"></div>
+    </div>
   </div>
 </div>
+<footer>Kilde: SSB tabell 11418 (median/gjennomsnitt) + 12521 (desiler → Q1/Q3) · Heltidsansatte · November · CC BY 4.0</footer>
 
-<div class="legend">
-  <span><span class="legend-box" style="background:#85B7EB;"></span>Antall jobber</span>
-  <span><span class="legend-box" style="background:#185FA5;"></span>Vanligste intervall</span>
-  <span><span class="legend-box" style="background:#D85A30;"></span>Median (53 490 kr)</span>
-  <span><span class="legend-box" style="background:#1D9E75;"></span>Gjennomsnitt (59 370 kr)</span>
-</div>
-
-<div class="chart-wrap">
-  <canvas id="salaryChart" role="img" aria-label="Søylediagram over lønnsfordeling i Norge 2024. Mest vanlige intervall er 40 000–45 000 kr/mnd. Median 53 490 kr, gjennomsnitt 59 370 kr.">
-    Lønnsfordeling Norge 2024: flest jobber i 40 000–45 000 kr/mnd, median 53 490 kr, gjennomsnitt 59 370 kr.
-  </canvas>
-</div>
-<p class="source">Kilde: SSB lønnsstatistikk 2024 (tabell 11418), via FriFagbevegelse.</p>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const labels = [
-  '5–10k','10–15k','15–20k','20–25k','25–30k','30–35k','35–40k',
-  '40–45k','45–50k','50–55k','55–60k','60–65k','65–70k','70–75k',
-  '75–80k','80–85k','85–90k','90–100k','100–120k','120k+'
-];
-const data = [18,26,38,55,80,115,190,430,350,270,210,165,128,95,70,52,40,52,60,45];
-const medianIdx = 7.6;
-const avgIdx   = 11.85;
+const YEARS = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+let data = {};
+let mode = 'single';
+let charts = {};
 
-new Chart(document.getElementById('salaryChart'), {
-  type: 'bar',
-  data: {
-    labels,
-    datasets: [{
-      label: 'Antall jobber (tusen)',
-      data,
-      backgroundColor: data.map((_, i) => i === 7 ? '#185FA5' : '#85B7EB'),
-      borderWidth: 0,
-      barPercentage: 0.95,
-      categoryPercentage: 1.0
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => ' ~' + ctx.parsed.y.toLocaleString('nb-NO') + ' 000 jobber'
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        ticks: { font: { size: 10 }, color: '#888', autoSkip: false, maxRotation: 45 }
-      },
-      y: {
-        grid: { color: 'rgba(136,135,128,0.15)' },
-        ticks: { font: { size: 11 }, color: '#888', callback: v => v + 'k' },
-        title: { display: true, text: 'Antall jobber (tusen)', font: { size: 11 }, color: '#888' }
+const fmtK = v => v == null ? '–' : Math.round(v/1000) + ' 000 kr';
+const ttDark = {backgroundColor:'#1a1714',titleColor:'#9a9182',bodyColor:'#f4f1eb',padding:12};
+
+async function postSSB(tableId, query) {
+  const r = await fetch(`https://data.ssb.no/api/v0/no/table/${tableId}`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({query, response: {format:'json-stat2'}})
+  });
+  if (!r.ok) throw new Error(`SSB ${tableId} svarte HTTP ${r.status}`);
+  return r.json();
+}
+
+async function fetchAll() {
+  const sector = document.getElementById('sel-sector').value;
+  const gender = document.getElementById('sel-gender').value;
+
+  // Fetch median + mean from table 11418
+  const j1 = await postSSB('11418', [
+    {code:'MaaleMetode', selection:{filter:'item', values:['01','02']}},
+    {code:'Yrke',        selection:{filter:'item', values:['0-9']}},
+    {code:'Sektor',      selection:{filter:'item', values:[sector]}},
+    {code:'Kjonn',       selection:{filter:'item', values:[gender]}},
+    {code:'AvtaltVanlig',selection:{filter:'item', values:['5']}},
+    {code:'ContentsCode',selection:{filter:'item', values:['Manedslonn']}},
+    {code:'Tid',         selection:{filter:'all',  values:['*']}}
+  ]);
+
+  // Fetch decile boundaries from table 12521 (only available for ALLE/begge kjønn)
+  const j2 = await postSSB('12521', [
+    {code:'Kjonn',       selection:{filter:'item', values:['0']}},
+    {code:'Sektor',      selection:{filter:'item', values:['ALLE']}},
+    {code:'ContentsCode',selection:{filter:'item', values:['GrvManedslonn']}},
+    {code:'Tid',         selection:{filter:'all',  values:['*']}}
+  ]);
+
+  return {j1, j2};
+}
+
+function parseData(j1, j2) {
+  // Parse 11418 → median, mean per year
+  const mIdx = j1.dimension.MaaleMetode.category.index;
+  const tIdx = j1.dimension.Tid.category.index;
+  const v1   = j1.value;
+  const nT   = Object.keys(tIdx).length;
+
+  const result = {};
+  YEARS.forEach(y => {
+    const ti = tIdx[y];
+    if (ti === undefined) return;
+    result[y] = {
+      median: v1[mIdx['01'] * nT + ti],
+      mean:   v1[mIdx['02'] * nT + ti],
+      q1: null, q3: null
+    };
+  });
+
+  // Parse 12521 → decile boundaries → Q1 (P25) and Q3 (P75)
+  const dIdx = j2.dimension.Desiler.category.index;
+  const tIdx2 = j2.dimension.Tid.category.index;
+  const v2    = j2.value;
+  const nT2   = Object.keys(tIdx2).length;
+  const nD    = Object.keys(dIdx).length;
+
+  // Desil 2 = P20 boundary, Desil 3 = P30 boundary → Q1 ≈ avg
+  // Desil 7 = P70 boundary, Desil 8 = P80 boundary → Q3 ≈ avg
+  const getDecile = (code, ti) => {
+    const di = dIdx[code];
+    if (di === undefined) return null;
+    return v2[di * nT2 + ti];
+  };
+
+  YEARS.forEach(y => {
+    const ti = tIdx2[y];
+    if (ti === undefined || !result[y]) return;
+    const d2 = getDecile('02', ti), d3 = getDecile('03', ti);
+    const d7 = getDecile('07', ti), d8 = getDecile('08', ti);
+    result[y].q1 = (d2 != null && d3 != null) ? Math.round((d2 + d3) / 2) : null;
+    result[y].q3 = (d7 != null && d8 != null) ? Math.round((d7 + d8) / 2) : null;
+  });
+
+  return result;
+}
+
+function populateSelectors() {
+  ['sel-y1','sel-y2'].forEach(id => {
+    const el = document.getElementById(id);
+    YEARS.forEach(y => { const o = document.createElement('option'); o.value = o.textContent = y; el.appendChild(o); });
+  });
+  document.getElementById('sel-y1').value = '2024';
+  document.getElementById('sel-y2').value = '2019';
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-single').classList.toggle('active', m==='single');
+  document.getElementById('btn-compare').classList.toggle('active', m==='compare');
+  document.getElementById('ctrl-y2').style.display = m==='compare' ? '' : 'none';
+  document.getElementById('lbl-y1').textContent = m==='compare' ? 'Basisår' : 'År';
+  render();
+}
+
+function render() {
+  const y1 = document.getElementById('sel-y1').value;
+  const y2 = document.getElementById('sel-y2').value;
+  renderStats(y1, y2);
+  renderTrend(y1, y2);
+  if (mode === 'single') {
+    renderDist(y1); renderGrowth();
+    document.getElementById('single-section').style.display = '';
+    document.getElementById('compare-section').style.display = 'none';
+  } else {
+    renderCompare(y1, y2);
+    document.getElementById('single-section').style.display = 'none';
+    document.getElementById('compare-section').style.display = '';
+  }
+}
+
+function renderStats(y1, y2) {
+  const d1 = data[y1], d2 = mode==='compare' ? data[y2] : null;
+  const defs = [
+    {label:'Median lønn', key:'median', cls:'c1'},
+    {label:'Gjennomsnitt', key:'mean',  cls:'c2'},
+    {label:'Q1 (nedre 25%)', key:'q1', cls:'c3'},
+    {label:'Q3 (øvre 25%)', key:'q3',  cls:'c4'},
+  ];
+  document.getElementById('stat-row').innerHTML = defs.map(c => {
+    const v1 = d1?.[c.key];
+    let diff = '';
+    if (d2) {
+      const v2 = d2[c.key];
+      if (v1 && v2) {
+        const p = ((v1-v2)/v2*100).toFixed(1);
+        diff = `<div class="s-compare ${p>0?'up':'dn'}">${p>0?'+':''}${p}% vs ${y2}</div>`;
       }
     }
-  },
-  plugins: [{
-    id: 'verticalLines',
-    afterDraw(chart) {
-      const { ctx, scales: { x, y } } = chart;
-      const drawLine = (idx, color) => {
-        const xPos = x.getPixelForValue(idx);
-        ctx.save();
-        ctx.beginPath();
-        ctx.setLineDash([5, 4]);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2;
-        ctx.moveTo(xPos, y.top);
-        ctx.lineTo(xPos, y.bottom);
-        ctx.stroke();
-        ctx.restore();
-      };
-      drawLine(medianIdx, '#D85A30');
-      drawLine(avgIdx,    '#1D9E75');
+    return `<div class="stat-card ${c.cls}">
+      <div class="s-label">${c.label}</div>
+      <div class="s-val">${fmtK(v1)}</div>
+      <div class="s-year">${y1}</div>${diff}
+    </div>`;
+  }).join('');
+}
+
+function mkChart(id, config) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), config);
+}
+
+function renderTrend(y1, y2) {
+  const medians = YEARS.map(y => data[y]?.median ?? null);
+  const means   = YEARS.map(y => data[y]?.mean   ?? null);
+  const q1s     = YEARS.map(y => data[y]?.q1      ?? null);
+  const q3s     = YEARS.map(y => data[y]?.q3      ?? null);
+  const sel     = mode==='compare' ? [y1,y2] : [y1];
+
+  mkChart('trendChart', {
+    type: 'line',
+    data: {labels: YEARS, datasets: [
+      {label:'Q3', data:q3s, borderColor:'transparent', backgroundColor:'rgba(196,154,34,.13)', fill:'+1', pointRadius:0, tension:.35, order:4},
+      {label:'Q1', data:q1s, borderColor:'transparent', backgroundColor:'transparent', fill:false, pointRadius:0, tension:.35, order:4},
+      {label:'Median', data:medians, borderColor:'#c94f2c', backgroundColor:'transparent', borderWidth:2.5,
+        pointBackgroundColor:'#c94f2c', pointRadius:YEARS.map(y=>sel.includes(y)?7:3.5), pointHoverRadius:8, tension:.35, order:1},
+      {label:'Gjennomsnitt', data:means, borderColor:'#2c6e5e', backgroundColor:'transparent', borderWidth:2.5, borderDash:[5,3],
+        pointBackgroundColor:'#2c6e5e', pointRadius:YEARS.map(y=>sel.includes(y)?7:3.5), pointHoverRadius:8, tension:.35, order:2},
+    ]},
+    options: {responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index', intersect:false},
+      plugins:{legend:{display:false}, tooltip:{...ttDark,
+        callbacks:{label:ctx=>{
+          if(ctx.dataset.label==='Q1'||ctx.dataset.label==='Q3') return null;
+          return ` ${ctx.dataset.label}: ${Math.round(ctx.parsed.y).toLocaleString('nb-NO')} kr`;
+        }}
+      }},
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{family:"'DM Mono'",size:11}, color:'#7a7568'}},
+        y:{grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{family:"'DM Mono'",size:11}, color:'#7a7568', callback:v=>(v/1000).toFixed(0)+'k'}}
+      }
     }
-  }]
-});
+  });
+}
+
+function renderDist(y1) {
+  document.getElementById('dist-title').textContent = `Lønnsnivåer · ${y1}`;
+  const d = data[y1]; if (!d) return;
+  const labels = ['Q1 (P25)','Median','Gjennomsnitt','Q3 (P75)'];
+  const vals   = [d.q1, d.median, d.mean, d.q3];
+  const colors = ['#2a4a8c','#c94f2c','#2c6e5e','#c49a22'];
+  const min    = Math.min(...vals.filter(Boolean));
+  mkChart('distChart', {
+    type:'bar',
+    data:{labels, datasets:[{data:vals, backgroundColor:colors.map(c=>c+'cc'), borderColor:colors, borderWidth:1.5, borderRadius:5}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{...ttDark, callbacks:{label:ctx=>` ${Math.round(ctx.parsed.y).toLocaleString('nb-NO')} kr`}}},
+      scales:{
+        x:{grid:{display:false}, ticks:{font:{size:11}, color:'#7a7568'}},
+        y:{grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{family:"'DM Mono'",size:10}, color:'#7a7568', callback:v=>(v/1000).toFixed(0)+'k'},
+          min: Math.round(min*.88/1000)*1000}
+      }
+    }
+  });
+}
+
+function renderGrowth() {
+  const labels = YEARS.slice(1);
+  const vals = labels.map((y,i) => {
+    const c = data[y]?.median, p = data[YEARS[i]]?.median;
+    return c && p ? +((c-p)/p*100).toFixed(1) : null;
+  });
+  mkChart('growthChart', {
+    type:'bar',
+    data:{labels, datasets:[{label:'Vekst %', data:vals,
+      backgroundColor:vals.map(v=>v>0?'#2c6e5ecc':'#c94f2ccc'),
+      borderColor:vals.map(v=>v>0?'#2c6e5e':'#c94f2c'),
+      borderWidth:1.5, borderRadius:4}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{...ttDark, callbacks:{label:ctx=>` ${ctx.parsed.y>0?'+':''}${ctx.parsed.y}%`}}},
+      scales:{
+        x:{grid:{display:false}, ticks:{font:{size:11}, color:'#7a7568'}},
+        y:{grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{family:"'DM Mono'",size:11}, color:'#7a7568', callback:v=>v+'%'}}
+      }
+    }
+  });
+}
+
+function renderCompare(y1, y2) {
+  document.getElementById('cmp-title').textContent = `Sammenligning · ${y2} → ${y1}`;
+  const d1 = data[y1], d2 = data[y2];
+  const defs = [
+    {label:'Median lønn',    key:'median', col1:'#c94f2c', col2:'#e09882'},
+    {label:'Gjennomsnitt',   key:'mean',   col1:'#2c6e5e', col2:'#85bfaf'},
+    {label:'Q1 (nedre 25%)', key:'q1',     col1:'#2a4a8c', col2:'#7a9ad4'},
+    {label:'Q3 (øvre 25%)', key:'q3',      col1:'#c49a22', col2:'#e8ca7a'},
+  ];
+  const maxV = Math.max(...defs.flatMap(m=>[d1?.[m.key]??0, d2?.[m.key]??0]));
+  document.getElementById('cmp-bars').innerHTML = defs.map(m => {
+    const v1=d1?.[m.key]??0, v2=d2?.[m.key]??0;
+    const w1=(v1/maxV*100).toFixed(1), w2=(v2/maxV*100).toFixed(1);
+    const p = v2 ? ((v1-v2)/v2*100).toFixed(1) : '–';
+    const sign = p > 0 ? '+' : '';
+    return `<div class="bar-group">
+      <div class="bar-label">${m.label} <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${sign}${p}%</span></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:32px">${y1}</div>
+          <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:${w1}%;background:${m.col1}">${Math.round(v1).toLocaleString('nb-NO')} kr</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:32px">${y2}</div>
+          <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:${w2}%;background:${m.col2}">${Math.round(v2).toLocaleString('nb-NO')} kr</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function refetch() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loading').style.display = '';
+  document.getElementById('error-area').style.display = 'none';
+  try {
+    const {j1, j2} = await fetchAll();
+    data = parseData(j1, j2);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = '';
+    render();
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-area').style.display = '';
+    document.getElementById('error-area').innerHTML = `<div class="error-box">Kunne ikke hente data fra SSB.<br><small>${e.message}</small></div>`;
+  }
+}
+
+populateSelectors();
+refetch();
 </script>
 </body>
 </html>
