@@ -14,18 +14,21 @@
   --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
 }
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
-header{background:var(--text);color:var(--bg);padding:2.5rem 3rem 2rem;border-bottom:3px solid var(--accent)}
-header .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9a9182;margin-bottom:.5rem}
+header{background:var(--text);color:var(--bg);padding:2.5rem 3rem 2rem;border-bottom:3px solid var(--accent);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem}
+.header-left .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9a9182;margin-bottom:.5rem}
 header h1{font-size:clamp(1.6rem,4vw,2.6rem);font-weight:300;letter-spacing:-.02em;line-height:1.15}
 header h1 span{color:var(--accent);font-weight:500}
-header .sub{margin-top:.5rem;font-size:14px;color:#9a9182}
+.header-left .sub{margin-top:.5rem;font-size:14px;color:#9a9182}
+.lang-toggle{display:flex;border:1.5px solid #3a3530;border-radius:6px;overflow:hidden;align-self:flex-start;margin-top:.25rem}
+.lang-toggle button{font-family:var(--mono);font-size:11px;letter-spacing:.06em;background:none;border:none;padding:7px 14px;cursor:pointer;color:#9a9182;transition:all .15s}
+.lang-toggle button.active{background:#c94f2c;color:#fff}
 .main{max-width:1100px;margin:0 auto;padding:2.5rem 2rem 4rem}
 .controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:2rem}
 .ctrl-group{display:flex;flex-direction:column;gap:6px}
 .ctrl-group label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 select{
   font-family:var(--sans);font-size:14px;background:var(--surface);border:1.5px solid var(--border);
-  border-radius:6px;padding:8px 32px 8px 12px;color:var(--text);appearance:none;cursor:pointer;min-width:110px;
+  border-radius:6px;padding:8px 32px 8px 12px;color:var(--text);appearance:none;cursor:pointer;min-width:120px;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7568' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 10px center;
 }
@@ -42,7 +45,7 @@ select:focus{outline:none;border-color:var(--accent)}
 .stat-card.c1::before{background:var(--accent)}.stat-card.c2::before{background:var(--accent2)}
 .stat-card.c3::before{background:var(--accent3)}.stat-card.c4::before{background:#c49a22}
 .s-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.s-val{font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1.1}
+.s-val{font-size:20px;font-weight:500;letter-spacing:-.01em;line-height:1.2;font-family:var(--mono)}
 .s-year{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
 .s-compare{font-family:var(--mono);font-size:11px;margin-top:4px}
 .s-compare.up{color:var(--accent2)}.s-compare.dn{color:var(--accent)}
@@ -59,101 +62,221 @@ select:focus{outline:none;border-color:var(--accent)}
 .bar-group{margin-bottom:1.25rem}
 .bar-label{font-size:13px;margin-bottom:5px}
 .bar-track{background:var(--surface2);border-radius:4px;height:28px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-family:var(--mono);font-size:12px;color:#fff;transition:width .6s cubic-bezier(.16,1,.3,1);min-width:80px;white-space:nowrap}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-family:var(--mono);font-size:11px;color:#fff;transition:width .6s cubic-bezier(.16,1,.3,1);min-width:90px;white-space:nowrap}
 .error-box{background:#fff3f0;border:1.5px solid #f5b8ae;border-radius:8px;padding:1.5rem;color:#9b2d1a;font-size:14px;text-align:center}
 footer{text-align:center;padding:2rem;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.05em;border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
 <header>
-  <div class="eyebrow">Statistisk sentralbyrå · Live data · Tabell 11418 + 12521</div>
-  <h1>Norsk <span>lønnsstatistikk</span></h1>
-  <div class="sub">Månedslønn for heltidsansatte · 2015–2025 · Alle yrker, alle sektorer</div>
+  <div class="header-left">
+    <div class="eyebrow" data-i="eyebrow">Statistisk sentralbyrå · Live data · Tabell 11418 + 12521</div>
+    <h1 data-i="h1">Norsk <span>lønnsstatistikk</span></h1>
+    <div class="sub" data-i="sub">Månedslønn for heltidsansatte · 2015–2025 · Alle yrker, alle sektorer</div>
+  </div>
+  <div class="lang-toggle">
+    <button class="active" onclick="setLang('no')">NO</button>
+    <button onclick="setLang('en')">EN</button>
+  </div>
 </header>
 <div class="main">
-  <div id="loading"><div class="spinner"></div>Henter data fra SSB…</div>
+  <div id="loading"><div class="spinner"></div><span data-i="loading">Henter data fra SSB…</span></div>
   <div id="error-area" style="display:none"></div>
   <div id="app" style="display:none">
     <div class="controls">
       <div class="ctrl-group">
-        <label>Modus</label>
+        <label data-i="lbl-mode">Modus</label>
         <div class="mode-toggle">
-          <button class="active" id="btn-single" onclick="setMode('single')">Enkeltår</button>
-          <button id="btn-compare" onclick="setMode('compare')">Sammenlign</button>
+          <button class="active" id="btn-single" onclick="setMode('single')" data-i="btn-single">Enkeltår</button>
+          <button id="btn-compare" onclick="setMode('compare')" data-i="btn-compare">Sammenlign</button>
         </div>
       </div>
       <div class="ctrl-group">
-        <label id="lbl-y1">År</label>
+        <label id="lbl-y1" data-i="lbl-y1">År</label>
         <select id="sel-y1" onchange="render()"></select>
       </div>
       <div class="ctrl-group" id="ctrl-y2" style="display:none">
-        <label>Sammenlign med</label>
+        <label data-i="lbl-y2">Sammenlign med</label>
         <select id="sel-y2" onchange="render()"></select>
       </div>
       <div class="ctrl-group">
-        <label>Sektor</label>
+        <label data-i="lbl-sector">Sektor</label>
         <select id="sel-sector" onchange="refetch()">
-          <option value="ALLE">Alle sektorer</option>
-          <option value="A+B+D+E">Privat sektor</option>
-          <option value="6500">Kommunal sektor</option>
-          <option value="6100">Statsforvaltningen</option>
+          <option value="ALLE" data-i="sec-all">Alle sektorer</option>
+          <option value="A+B+D+E" data-i="sec-priv">Privat sektor</option>
+          <option value="6500" data-i="sec-mun">Kommunal sektor</option>
+          <option value="6100" data-i="sec-state">Statsforvaltningen</option>
         </select>
       </div>
       <div class="ctrl-group">
-        <label>Kjønn</label>
+        <label data-i="lbl-gender">Kjønn</label>
         <select id="sel-gender" onchange="refetch()">
-          <option value="0">Begge kjønn</option>
-          <option value="1">Menn</option>
-          <option value="2">Kvinner</option>
+          <option value="0" data-i="gen-all">Begge kjønn</option>
+          <option value="1" data-i="gen-m">Menn</option>
+          <option value="2" data-i="gen-f">Kvinner</option>
         </select>
       </div>
     </div>
     <div class="stat-row" id="stat-row"></div>
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title">Lønnsutvikling 2015–2025</div>
+        <div class="panel-title" data-i="trend-title">Lønnsutvikling 2015–2025</div>
         <div class="legend">
-          <span><span class="legend-dot" style="background:var(--accent)"></span>Median</span>
-          <span><span class="legend-dot" style="background:var(--accent2)"></span>Gjennomsnitt</span>
-          <span><span class="legend-band" style="background:#c49a22"></span>Q1–Q3 (25–75%)</span>
+          <span><span class="legend-dot" style="background:var(--accent)"></span><span data-i="leg-median">Median</span></span>
+          <span><span class="legend-dot" style="background:var(--accent2)"></span><span data-i="leg-mean">Gjennomsnitt</span></span>
+          <span><span class="legend-band" style="background:#c49a22"></span><span data-i="leg-band">Q1–Q3 (25–75%)</span></span>
         </div>
       </div>
       <div class="chart-wrap"><canvas id="trendChart" role="img" aria-label="Lønnsutvikling Norge 2015-2025"></canvas></div>
     </div>
     <div id="single-section" class="two-col">
       <div class="panel">
-        <div class="panel-header"><div class="panel-title" id="dist-title">Lønnsnivåer</div></div>
+        <div class="panel-header"><div class="panel-title" id="dist-title"></div></div>
         <div class="chart-wrap" style="height:240px"><canvas id="distChart" role="img" aria-label="Lønnsnivåer valgt år"></canvas></div>
       </div>
       <div class="panel">
-        <div class="panel-header"><div class="panel-title">Medienvekst år for år</div></div>
+        <div class="panel-header"><div class="panel-title" data-i="growth-title">Medienvekst år for år</div></div>
         <div class="chart-wrap" style="height:240px"><canvas id="growthChart" role="img" aria-label="Lønnsvekst år for år"></canvas></div>
       </div>
     </div>
     <div id="compare-section" class="panel" style="display:none">
-      <div class="panel-header"><div class="panel-title" id="cmp-title">Sammenligning</div></div>
+      <div class="panel-header"><div class="panel-title" id="cmp-title"></div></div>
       <div id="cmp-bars"></div>
     </div>
   </div>
 </div>
-<footer>Kilde: SSB tabell 11418 (median/gjennomsnitt) + 12521 (desiler → Q1/Q3) · Heltidsansatte · November · CC BY 4.0</footer>
+<footer data-i="footer">Kilde: SSB tabell 11418 (median/gjennomsnitt) + 12521 (desiler → Q1/Q3) · Heltidsansatte · November · CC BY 4.0</footer>
 
 <script>
 const YEARS = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
 let data = {};
 let mode = 'single';
+let lang = 'no';
 let charts = {};
 
-const fmtK = v => v == null ? '–' : Math.round(v/1000) + ' 000 kr';
+// ── Translations
+const T = {
+  no: {
+    eyebrow: 'Statistisk sentralbyrå · Live data · Tabell 11418 + 12521',
+    h1: 'Norsk <span>lønnsstatistikk</span>',
+    sub: 'Månedslønn for heltidsansatte · 2015–2025 · Alle yrker, alle sektorer',
+    loading: 'Henter data fra SSB…',
+    'lbl-mode': 'Modus',
+    'btn-single': 'Enkeltår',
+    'btn-compare': 'Sammenlign',
+    'lbl-y1-single': 'År',
+    'lbl-y1-compare': 'Basisår',
+    'lbl-y2': 'Sammenlign med',
+    'lbl-sector': 'Sektor',
+    'sec-all': 'Alle sektorer',
+    'sec-priv': 'Privat sektor',
+    'sec-mun': 'Kommunal sektor',
+    'sec-state': 'Statsforvaltningen',
+    'lbl-gender': 'Kjønn',
+    'gen-all': 'Begge kjønn',
+    'gen-m': 'Menn',
+    'gen-f': 'Kvinner',
+    'card-median': 'Median lønn',
+    'card-mean': 'Gjennomsnitt',
+    'card-q1': 'Q1 (nedre 25%)',
+    'card-q3': 'Q3 (øvre 25%)',
+    'trend-title': 'Lønnsutvikling 2015–2025',
+    'leg-median': 'Median',
+    'leg-mean': 'Gjennomsnitt',
+    'leg-band': 'Q1–Q3 (25–75%)',
+    'dist-title': 'Lønnsnivåer',
+    'growth-title': 'Medienvekst år for år',
+    'dist-labels': ['Q1 (P25)','Median','Gjennomsnitt','Q3 (P75)'],
+    'cmp-prefix': 'Sammenligning',
+    'vs': 'vs',
+    unit: 'kr',
+    footer: 'Kilde: SSB tabell 11418 (median/gjennomsnitt) + 12521 (desiler → Q1/Q3) · Heltidsansatte · November · CC BY 4.0',
+    error: 'Kunne ikke hente data fra SSB.',
+  },
+  en: {
+    eyebrow: 'Statistics Norway · Live data · Table 11418 + 12521',
+    h1: 'Norwegian <span>wage statistics</span>',
+    sub: 'Monthly wage for full-time employees · 2015–2025 · All occupations, all sectors',
+    loading: 'Fetching data from Statistics Norway…',
+    'lbl-mode': 'Mode',
+    'btn-single': 'Single year',
+    'btn-compare': 'Compare',
+    'lbl-y1-single': 'Year',
+    'lbl-y1-compare': 'Base year',
+    'lbl-y2': 'Compare with',
+    'lbl-sector': 'Sector',
+    'sec-all': 'All sectors',
+    'sec-priv': 'Private sector',
+    'sec-mun': 'Municipal sector',
+    'sec-state': 'Central government',
+    'lbl-gender': 'Gender',
+    'gen-all': 'Both genders',
+    'gen-m': 'Men',
+    'gen-f': 'Women',
+    'card-median': 'Median wage',
+    'card-mean': 'Average wage',
+    'card-q1': 'Q1 (bottom 25%)',
+    'card-q3': 'Q3 (top 25%)',
+    'trend-title': 'Wage trend 2015–2025',
+    'leg-median': 'Median',
+    'leg-mean': 'Average',
+    'leg-band': 'Q1–Q3 (25–75%)',
+    'dist-title': 'Wage levels',
+    'growth-title': 'Median growth year on year',
+    'dist-labels': ['Q1 (P25)','Median','Average','Q3 (P75)'],
+    'cmp-prefix': 'Comparison',
+    'vs': 'vs',
+    unit: 'NOK',
+    footer: 'Source: Statistics Norway table 11418 (median/average) + 12521 (deciles → Q1/Q3) · Full-time employees · November · CC BY 4.0',
+    error: 'Could not fetch data from Statistics Norway.',
+  }
+};
+
+const t = key => T[lang][key] || key;
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i]').forEach(el => {
+    const key = el.dataset.i;
+    if (key === 'h1') { el.innerHTML = t('h1'); return; }
+    const val = T[lang][key];
+    if (val !== undefined) el.textContent = val;
+  });
+  // Sector options
+  document.querySelectorAll('#sel-sector option').forEach(opt => {
+    const key = opt.dataset.i;
+    if (key && T[lang][key]) opt.textContent = T[lang][key];
+  });
+  // Gender options
+  document.querySelectorAll('#sel-gender option').forEach(opt => {
+    const key = opt.dataset.i;
+    if (key && T[lang][key]) opt.textContent = T[lang][key];
+  });
+  // y1 label
+  document.getElementById('lbl-y1').textContent = t(mode === 'compare' ? 'lbl-y1-compare' : 'lbl-y1-single');
+}
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-toggle button').forEach((b,i) => b.classList.toggle('active', (i===0&&l==='no')||(i===1&&l==='en')));
+  applyTranslations();
+  if (Object.keys(data).length) render();
+}
+
+// ── Format: no rounding, exact source values
+function fmtVal(v) {
+  if (v == null) return '–';
+  return v.toLocaleString(lang === 'en' ? 'en-NO' : 'nb-NO') + ' ' + t('unit');
+}
+
 const ttDark = {backgroundColor:'#1a1714',titleColor:'#9a9182',bodyColor:'#f4f1eb',padding:12};
 
 async function postSSB(tableId, query) {
   const r = await fetch(`https://data.ssb.no/api/v0/no/table/${tableId}`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({query, response: {format:'json-stat2'}})
+    body: JSON.stringify({query, response:{format:'json-stat2'}})
   });
-  if (!r.ok) throw new Error(`SSB ${tableId} svarte HTTP ${r.status}`);
+  if (!r.ok) throw new Error(`SSB ${tableId} HTTP ${r.status}`);
   return r.json();
 }
 
@@ -161,30 +284,27 @@ async function fetchAll() {
   const sector = document.getElementById('sel-sector').value;
   const gender = document.getElementById('sel-gender').value;
 
-  // Fetch median + mean from table 11418
-  const j1 = await postSSB('11418', [
-    {code:'MaaleMetode', selection:{filter:'item', values:['01','02']}},
-    {code:'Yrke',        selection:{filter:'item', values:['0-9']}},
-    {code:'Sektor',      selection:{filter:'item', values:[sector]}},
-    {code:'Kjonn',       selection:{filter:'item', values:[gender]}},
-    {code:'AvtaltVanlig',selection:{filter:'item', values:['5']}},
-    {code:'ContentsCode',selection:{filter:'item', values:['Manedslonn']}},
-    {code:'Tid',         selection:{filter:'all',  values:['*']}}
+  const [j1, j2] = await Promise.all([
+    postSSB('11418', [
+      {code:'MaaleMetode', selection:{filter:'item', values:['01','02']}},
+      {code:'Yrke',        selection:{filter:'item', values:['0-9']}},
+      {code:'Sektor',      selection:{filter:'item', values:[sector]}},
+      {code:'Kjonn',       selection:{filter:'item', values:[gender]}},
+      {code:'AvtaltVanlig',selection:{filter:'item', values:['5']}},
+      {code:'ContentsCode',selection:{filter:'item', values:['Manedslonn']}},
+      {code:'Tid',         selection:{filter:'all',  values:['*']}}
+    ]),
+    postSSB('12521', [
+      {code:'Kjonn',       selection:{filter:'item', values:['0']}},
+      {code:'Sektor',      selection:{filter:'item', values:['ALLE']}},
+      {code:'ContentsCode',selection:{filter:'item', values:['GrvManedslonn']}},
+      {code:'Tid',         selection:{filter:'all',  values:['*']}}
+    ])
   ]);
-
-  // Fetch decile boundaries from table 12521 (only available for ALLE/begge kjønn)
-  const j2 = await postSSB('12521', [
-    {code:'Kjonn',       selection:{filter:'item', values:['0']}},
-    {code:'Sektor',      selection:{filter:'item', values:['ALLE']}},
-    {code:'ContentsCode',selection:{filter:'item', values:['GrvManedslonn']}},
-    {code:'Tid',         selection:{filter:'all',  values:['*']}}
-  ]);
-
   return {j1, j2};
 }
 
 function parseData(j1, j2) {
-  // Parse 11418 → median, mean per year
   const mIdx = j1.dimension.MaaleMetode.category.index;
   const tIdx = j1.dimension.Tid.category.index;
   const v1   = j1.value;
@@ -201,28 +321,26 @@ function parseData(j1, j2) {
     };
   });
 
-  // Parse 12521 → decile boundaries → Q1 (P25) and Q3 (P75)
-  const dIdx = j2.dimension.Desiler.category.index;
+  // Decile boundaries: Q1 ≈ interpolate P25 from D2(P20) and D3(P30)
+  // Q3 ≈ interpolate P75 from D7(P70) and D8(P80)
+  const dIdx  = j2.dimension.Desiler.category.index;
   const tIdx2 = j2.dimension.Tid.category.index;
   const v2    = j2.value;
   const nT2   = Object.keys(tIdx2).length;
-  const nD    = Object.keys(dIdx).length;
 
-  // Desil 2 = P20 boundary, Desil 3 = P30 boundary → Q1 ≈ avg
-  // Desil 7 = P70 boundary, Desil 8 = P80 boundary → Q3 ≈ avg
-  const getDecile = (code, ti) => {
+  const getD = (code, ti) => {
     const di = dIdx[code];
-    if (di === undefined) return null;
-    return v2[di * nT2 + ti];
+    return di !== undefined ? v2[di * nT2 + ti] : null;
   };
 
   YEARS.forEach(y => {
     const ti = tIdx2[y];
     if (ti === undefined || !result[y]) return;
-    const d2 = getDecile('02', ti), d3 = getDecile('03', ti);
-    const d7 = getDecile('07', ti), d8 = getDecile('08', ti);
-    result[y].q1 = (d2 != null && d3 != null) ? Math.round((d2 + d3) / 2) : null;
-    result[y].q3 = (d7 != null && d8 != null) ? Math.round((d7 + d8) / 2) : null;
+    const d2 = getD('02', ti), d3 = getD('03', ti);
+    const d7 = getD('07', ti), d8 = getD('08', ti);
+    // Linear interpolation: P25 = D2 + 0.5*(D3-D2), P75 = D7 + 0.5*(D8-D7)
+    result[y].q1 = (d2 != null && d3 != null) ? d2 + 0.5 * (d3 - d2) : null;
+    result[y].q3 = (d7 != null && d8 != null) ? d7 + 0.5 * (d8 - d7) : null;
   });
 
   return result;
@@ -242,7 +360,7 @@ function setMode(m) {
   document.getElementById('btn-single').classList.toggle('active', m==='single');
   document.getElementById('btn-compare').classList.toggle('active', m==='compare');
   document.getElementById('ctrl-y2').style.display = m==='compare' ? '' : 'none';
-  document.getElementById('lbl-y1').textContent = m==='compare' ? 'Basisår' : 'År';
+  document.getElementById('lbl-y1').textContent = t(m==='compare' ? 'lbl-y1-compare' : 'lbl-y1-single');
   render();
 }
 
@@ -265,24 +383,24 @@ function render() {
 function renderStats(y1, y2) {
   const d1 = data[y1], d2 = mode==='compare' ? data[y2] : null;
   const defs = [
-    {label:'Median lønn', key:'median', cls:'c1'},
-    {label:'Gjennomsnitt', key:'mean',  cls:'c2'},
-    {label:'Q1 (nedre 25%)', key:'q1', cls:'c3'},
-    {label:'Q3 (øvre 25%)', key:'q3',  cls:'c4'},
+    {key:'median', cls:'c1'},
+    {key:'mean',   cls:'c2'},
+    {key:'q1',     cls:'c3'},
+    {key:'q3',     cls:'c4'},
   ];
   document.getElementById('stat-row').innerHTML = defs.map(c => {
     const v1 = d1?.[c.key];
     let diff = '';
     if (d2) {
       const v2 = d2[c.key];
-      if (v1 && v2) {
-        const p = ((v1-v2)/v2*100).toFixed(1);
-        diff = `<div class="s-compare ${p>0?'up':'dn'}">${p>0?'+':''}${p}% vs ${y2}</div>`;
+      if (v1 != null && v2 != null) {
+        const p = ((v1 - v2) / v2 * 100).toFixed(2);
+        diff = `<div class="s-compare ${p > 0 ? 'up' : 'dn'}">${p > 0 ? '+' : ''}${p}% ${t('vs')} ${y2}</div>`;
       }
     }
     return `<div class="stat-card ${c.cls}">
-      <div class="s-label">${c.label}</div>
-      <div class="s-val">${fmtK(v1)}</div>
+      <div class="s-label">${t('card-' + c.key)}</div>
+      <div class="s-val">${fmtVal(v1)}</div>
       <div class="s-year">${y1}</div>${diff}
     </div>`;
   }).join('');
@@ -298,50 +416,59 @@ function renderTrend(y1, y2) {
   const means   = YEARS.map(y => data[y]?.mean   ?? null);
   const q1s     = YEARS.map(y => data[y]?.q1      ?? null);
   const q3s     = YEARS.map(y => data[y]?.q3      ?? null);
-  const sel     = mode==='compare' ? [y1,y2] : [y1];
+  const sel     = mode === 'compare' ? [y1, y2] : [y1];
+  const locale  = lang === 'en' ? 'en-NO' : 'nb-NO';
 
   mkChart('trendChart', {
     type: 'line',
     data: {labels: YEARS, datasets: [
       {label:'Q3', data:q3s, borderColor:'transparent', backgroundColor:'rgba(196,154,34,.13)', fill:'+1', pointRadius:0, tension:.35, order:4},
       {label:'Q1', data:q1s, borderColor:'transparent', backgroundColor:'transparent', fill:false, pointRadius:0, tension:.35, order:4},
-      {label:'Median', data:medians, borderColor:'#c94f2c', backgroundColor:'transparent', borderWidth:2.5,
+      {label:t('leg-median'), data:medians, borderColor:'#c94f2c', backgroundColor:'transparent', borderWidth:2.5,
         pointBackgroundColor:'#c94f2c', pointRadius:YEARS.map(y=>sel.includes(y)?7:3.5), pointHoverRadius:8, tension:.35, order:1},
-      {label:'Gjennomsnitt', data:means, borderColor:'#2c6e5e', backgroundColor:'transparent', borderWidth:2.5, borderDash:[5,3],
+      {label:t('leg-mean'),   data:means,   borderColor:'#2c6e5e', backgroundColor:'transparent', borderWidth:2.5, borderDash:[5,3],
         pointBackgroundColor:'#2c6e5e', pointRadius:YEARS.map(y=>sel.includes(y)?7:3.5), pointHoverRadius:8, tension:.35, order:2},
     ]},
     options: {responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index', intersect:false},
       plugins:{legend:{display:false}, tooltip:{...ttDark,
         callbacks:{label:ctx=>{
-          if(ctx.dataset.label==='Q1'||ctx.dataset.label==='Q3') return null;
-          return ` ${ctx.dataset.label}: ${Math.round(ctx.parsed.y).toLocaleString('nb-NO')} kr`;
+          if (ctx.dataset.label==='Q1'||ctx.dataset.label==='Q3') return null;
+          return ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString(locale)} ${t('unit')}`;
         }}
       }},
       scales:{
         x:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{family:"'DM Mono'",size:11}, color:'#7a7568'}},
-        y:{grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{family:"'DM Mono'",size:11}, color:'#7a7568', callback:v=>(v/1000).toFixed(0)+'k'}}
+        y:{grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{family:"'DM Mono'",size:11}, color:'#7a7568',
+          callback: v => v.toLocaleString(locale)}}
       }
     }
   });
 }
 
 function renderDist(y1) {
-  document.getElementById('dist-title').textContent = `Lønnsnivåer · ${y1}`;
+  document.getElementById('dist-title').textContent = `${t('dist-title')} · ${y1}`;
   const d = data[y1]; if (!d) return;
-  const labels = ['Q1 (P25)','Median','Gjennomsnitt','Q3 (P75)'];
+  const labels = t('dist-labels');
   const vals   = [d.q1, d.median, d.mean, d.q3];
   const colors = ['#2a4a8c','#c94f2c','#2c6e5e','#c49a22'];
-  const min    = Math.min(...vals.filter(Boolean));
+  const locale = lang === 'en' ? 'en-NO' : 'nb-NO';
+  const validVals = vals.filter(v => v != null);
+  const min = Math.min(...validVals);
+
   mkChart('distChart', {
-    type:'bar',
+    type: 'bar',
     data:{labels, datasets:[{data:vals, backgroundColor:colors.map(c=>c+'cc'), borderColor:colors, borderWidth:1.5, borderRadius:5}]},
     options:{responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false}, tooltip:{...ttDark, callbacks:{label:ctx=>` ${Math.round(ctx.parsed.y).toLocaleString('nb-NO')} kr`}}},
+      plugins:{legend:{display:false}, tooltip:{...ttDark,
+        callbacks:{label:ctx=>` ${ctx.parsed.y.toLocaleString(locale)} ${t('unit')}`}
+      }},
       scales:{
         x:{grid:{display:false}, ticks:{font:{size:11}, color:'#7a7568'}},
-        y:{grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{family:"'DM Mono'",size:10}, color:'#7a7568', callback:v=>(v/1000).toFixed(0)+'k'},
-          min: Math.round(min*.88/1000)*1000}
+        y:{grid:{color:'rgba(0,0,0,.06)'},
+          ticks:{font:{family:"'DM Mono'",size:10}, color:'#7a7568', callback:v=>v.toLocaleString(locale)},
+          min: Math.floor(min * 0.92)
+        }
       }
     }
   });
@@ -349,18 +476,20 @@ function renderDist(y1) {
 
 function renderGrowth() {
   const labels = YEARS.slice(1);
-  const vals = labels.map((y,i) => {
+  const vals = labels.map((y, i) => {
     const c = data[y]?.median, p = data[YEARS[i]]?.median;
-    return c && p ? +((c-p)/p*100).toFixed(1) : null;
+    return (c != null && p != null) ? +((c - p) / p * 100).toFixed(2) : null;
   });
   mkChart('growthChart', {
-    type:'bar',
-    data:{labels, datasets:[{label:'Vekst %', data:vals,
+    type: 'bar',
+    data:{labels, datasets:[{label:'%', data:vals,
       backgroundColor:vals.map(v=>v>0?'#2c6e5ecc':'#c94f2ccc'),
       borderColor:vals.map(v=>v>0?'#2c6e5e':'#c94f2c'),
       borderWidth:1.5, borderRadius:4}]},
     options:{responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false}, tooltip:{...ttDark, callbacks:{label:ctx=>` ${ctx.parsed.y>0?'+':''}${ctx.parsed.y}%`}}},
+      plugins:{legend:{display:false}, tooltip:{...ttDark,
+        callbacks:{label:ctx=>` ${ctx.parsed.y > 0 ? '+' : ''}${ctx.parsed.y}%`}
+      }},
       scales:{
         x:{grid:{display:false}, ticks:{font:{size:11}, color:'#7a7568'}},
         y:{grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{family:"'DM Mono'",size:11}, color:'#7a7568', callback:v=>v+'%'}}
@@ -370,30 +499,31 @@ function renderGrowth() {
 }
 
 function renderCompare(y1, y2) {
-  document.getElementById('cmp-title').textContent = `Sammenligning · ${y2} → ${y1}`;
+  const locale = lang === 'en' ? 'en-NO' : 'nb-NO';
+  document.getElementById('cmp-title').textContent = `${t('cmp-prefix')} · ${y2} → ${y1}`;
   const d1 = data[y1], d2 = data[y2];
   const defs = [
-    {label:'Median lønn',    key:'median', col1:'#c94f2c', col2:'#e09882'},
-    {label:'Gjennomsnitt',   key:'mean',   col1:'#2c6e5e', col2:'#85bfaf'},
-    {label:'Q1 (nedre 25%)', key:'q1',     col1:'#2a4a8c', col2:'#7a9ad4'},
-    {label:'Q3 (øvre 25%)', key:'q3',      col1:'#c49a22', col2:'#e8ca7a'},
+    {key:'median', col1:'#c94f2c', col2:'#e09882'},
+    {key:'mean',   col1:'#2c6e5e', col2:'#85bfaf'},
+    {key:'q1',     col1:'#2a4a8c', col2:'#7a9ad4'},
+    {key:'q3',     col1:'#c49a22', col2:'#e8ca7a'},
   ];
-  const maxV = Math.max(...defs.flatMap(m=>[d1?.[m.key]??0, d2?.[m.key]??0]));
+  const maxV = Math.max(...defs.flatMap(m => [d1?.[m.key]??0, d2?.[m.key]??0]));
   document.getElementById('cmp-bars').innerHTML = defs.map(m => {
-    const v1=d1?.[m.key]??0, v2=d2?.[m.key]??0;
-    const w1=(v1/maxV*100).toFixed(1), w2=(v2/maxV*100).toFixed(1);
-    const p = v2 ? ((v1-v2)/v2*100).toFixed(1) : '–';
+    const v1 = d1?.[m.key] ?? 0, v2 = d2?.[m.key] ?? 0;
+    const w1 = (v1 / maxV * 100).toFixed(2), w2 = (v2 / maxV * 100).toFixed(2);
+    const p  = v2 ? ((v1 - v2) / v2 * 100).toFixed(2) : '–';
     const sign = p > 0 ? '+' : '';
     return `<div class="bar-group">
-      <div class="bar-label">${m.label} <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${sign}${p}%</span></div>
+      <div class="bar-label">${t('card-' + m.key)} <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${sign}${p}%</span></div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:32px">${y1}</div>
-          <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:${w1}%;background:${m.col1}">${Math.round(v1).toLocaleString('nb-NO')} kr</div></div>
+          <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:${w1}%;background:${m.col1}">${v1.toLocaleString(locale)} ${t('unit')}</div></div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:32px">${y2}</div>
-          <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:${w2}%;background:${m.col2}">${Math.round(v2).toLocaleString('nb-NO')} kr</div></div>
+          <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:${w2}%;background:${m.col2}">${v2.toLocaleString(locale)} ${t('unit')}</div></div>
         </div>
       </div>
     </div>`;
@@ -413,7 +543,7 @@ async function refetch() {
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error-area').style.display = '';
-    document.getElementById('error-area').innerHTML = `<div class="error-box">Kunne ikke hente data fra SSB.<br><small>${e.message}</small></div>`;
+    document.getElementById('error-area').innerHTML = `<div class="error-box">${t('error')}<br><small>${e.message}</small></div>`;
   }
 }
 
